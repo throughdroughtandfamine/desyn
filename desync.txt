@@ -1,0 +1,86 @@
+local Enabled = false
+local Keybind = "Y"
+local Delay = 1
+local Interval = 5
+
+local OldTick = 0
+local Sleeping = false
+
+local RunService = game:GetService("RunService")
+local InputService = game:GetService("UserInputService")
+local LocalPlayer = game.Players.LocalPlayer
+local Round = math.floor
+local StarterGui = game:GetService("StarterGui")
+local SetProperty = sethiddenproperty
+
+local function ShowNotification(text)
+    pcall(function()
+        StarterGui:SetCore("SendNotification", {
+            Title = "DESYNC",
+            Text = text,
+            Icon = "",
+            Duration = 3
+        })
+    end)
+end
+
+function Desync()
+    task.spawn(function()
+        while Enabled do
+            task.wait()
+            if LocalPlayer.Character then
+                local loop = RunService.Heartbeat:Connect(function()
+                    SetProperty(LocalPlayer.Character.HumanoidRootPart, "NetworkIsSleeping", true)
+                    task.wait()
+                    SetProperty(LocalPlayer.Character.HumanoidRootPart, "NetworkIsSleeping", false)
+                    task.wait()
+                    SetProperty(LocalPlayer.Character.HumanoidRootPart, "NetworkIsSleeping", true)
+                    task.wait()
+                    SetProperty(LocalPlayer.Character.HumanoidRootPart, "NetworkIsSleeping", false)
+                    task.wait()
+                    SetProperty(LocalPlayer.Character.HumanoidRootPart, "NetworkIsSleeping", false)
+                    task.wait()
+                    SetProperty(LocalPlayer.Character.HumanoidRootPart, "NetworkIsSleeping", false)
+                    task.wait()
+                    SetProperty(LocalPlayer.Character.HumanoidRootPart, "NetworkIsSleeping", true)
+                    task.wait()
+                    SetProperty(LocalPlayer.Character.HumanoidRootPart, "NetworkIsSleeping", true)
+                    task.wait()
+                end)
+                task.wait()
+                if loop then
+                    loop:Disconnect()
+                end
+            end
+        end
+    end)
+end
+
+InputService.InputBegan:Connect(function(Key, ProcessedEvent)
+    if Key.KeyCode == Enum.KeyCode[Keybind] then
+        Enabled = not Enabled
+        
+        if Enabled then
+            ShowNotification("🟢 Enabled")
+            Desync()
+        else
+            ShowNotification("🔴 Disabled")
+        end
+    end
+    
+    if Key.KeyCode == Enum.KeyCode.Equals then
+        Delay += Interval
+        ShowNotification("Delay: " .. Delay)
+    end
+    
+    if Key.KeyCode == Enum.KeyCode.Minus then
+        if Delay - Interval > 0 then
+            Delay -= Interval
+        else
+            Delay = 0
+        end
+        ShowNotification("Delay: " .. Delay)
+    end
+end)
+
+ShowNotification("Desync Loaded | Press " .. Keybind)
