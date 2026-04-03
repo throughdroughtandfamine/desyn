@@ -1,6 +1,6 @@
 local Enabled = false
 local Keybind = "Y"
-local Delay = 0.1
+local Delay = 1
 local Interval = 5
 
 local OldTick = 0
